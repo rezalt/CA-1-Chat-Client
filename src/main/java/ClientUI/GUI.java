@@ -5,17 +5,31 @@
  */
 package ClientUI;
 
+import com.mycompany.ca1.client.EchoClient;
+import com.sun.jmx.remote.internal.ClientListenerInfo;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.AbstractListModel;
+import javax.swing.ListModel;
+import shared.ProtocolStrings;
+
 /**
  *
  * @author TimmosQuadros
  */
 public class GUI extends javax.swing.JFrame {
 
+    private final int MAX_USERS = 1000;
+    EchoClient client = new EchoClient();
+    String[] clientList;
+
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
+        init();
     }
 
     /**
@@ -69,6 +83,11 @@ public class GUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jButton2.setText("Login");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -76,7 +95,7 @@ public class GUI extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -159,6 +178,11 @@ public class GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        client.send(ProtocolStrings.ARGS.LOGIN+":"+jTextField2.getText());
+        receiveClientList();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -210,4 +234,52 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
+
+    private void init() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    client.connect("localhost", 8080);
+                } catch (IOException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }).start();
+
+    }
+
+    public void receiveClientList() {
+        String msg = client.receive();
+        //System.out.println(msg);
+        
+        String splitColon[] = msg.split(":");
+        
+        String splitComma[] = splitColon[1].split(",");
+        if (splitComma.length == 0) {
+            splitComma = new String[1];
+            splitComma[0] = splitColon[1];
+        }
+        
+        clientList = new String[splitComma.length];
+        
+        int i = 0;
+        for (String string : splitComma) {
+            clientList[i] = string;
+            i++;
+        }
+        jList1.setModel(new AbstractListModel<String>() {
+            @Override
+            public int getSize() {
+                return clientList.length;
+            }
+            @Override
+            public String getElementAt(int index) {
+                return clientList[index];
+            }
+        });
+
+    }
+
 }
