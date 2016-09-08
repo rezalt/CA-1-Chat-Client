@@ -8,6 +8,8 @@ package ClientUI;
 import com.mycompany.ca1.client.EchoClient;
 import com.sun.jmx.remote.internal.ClientListenerInfo;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
@@ -96,7 +98,7 @@ public class GUI extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, Short.MAX_VALUE)
+                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -110,6 +112,11 @@ public class GUI extends javax.swing.JFrame {
         jTextField2.setText("jTextField2");
 
         jButton1.setText("Send");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -181,12 +188,29 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         if (isLoggedIn) {
-            
-        }else {
+
+        } else {
             client.send(ProtocolStrings.ARGS.LOGIN + ":" + jTextField2.getText());
             receiveClientList();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        List<String> userList = jList1.getSelectedValuesList();
+        String msg = "";
+        String temp = "";
+        if (userList.isEmpty()) {
+            client.send("MSG::" + jTextField2.getText());
+        } else {
+            for (String string : userList) {
+                temp = temp + string + ",";
+
+            }
+            msg = "MSG:"+temp.substring(0, temp.length()-1)+":"+jTextField2.getText();
+            client.send(msg);
+        }
+
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
