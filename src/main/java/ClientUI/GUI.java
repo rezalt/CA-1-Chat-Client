@@ -7,6 +7,7 @@ package ClientUI;
 
 import com.mycompany.ca1.client.EchoClient;
 import com.sun.jmx.remote.internal.ClientListenerInfo;
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +111,11 @@ public class GUI extends javax.swing.JFrame {
         );
 
         jTextField2.setText("jTextField2");
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Send");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -204,13 +210,19 @@ public class GUI extends javax.swing.JFrame {
         } else {
             for (String string : userList) {
                 temp = temp + string + ",";
-
             }
-            msg = "MSG:"+temp.substring(0, temp.length()-1)+":"+jTextField2.getText();
+            msg = "MSG:"+temp.substring(0, temp.length()-1)+":"+jTextField2.getText();           
             client.send(msg);
+         //   jTextArea1.setForeground(Color.red);
+            jTextArea1.append("Mig: "+jTextField2.getText()+"\n");
+            
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
 
     /**
      * @param args the command line arguments
