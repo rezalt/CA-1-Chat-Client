@@ -23,6 +23,7 @@ public class GUI extends javax.swing.JFrame {
     private final int MAX_USERS = 1000;
     EchoClient client = new EchoClient();
     String[] clientList;
+    boolean isLoggedIn = false;
 
     /**
      * Creates new form GUI
@@ -179,8 +180,12 @@ public class GUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        client.send(ProtocolStrings.ARGS.LOGIN+":"+jTextField2.getText());
-        receiveClientList();
+        if (isLoggedIn) {
+            
+        }else {
+            client.send(ProtocolStrings.ARGS.LOGIN + ":" + jTextField2.getText());
+            receiveClientList();
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
@@ -251,35 +256,43 @@ public class GUI extends javax.swing.JFrame {
     }
 
     public void receiveClientList() {
-        String msg = client.receive();
-        //System.out.println(msg);
-        
-        String splitColon[] = msg.split(":");
-        
-        String splitComma[] = splitColon[1].split(",");
-        if (splitComma.length == 0) {
-            splitComma = new String[1];
-            splitComma[0] = splitColon[1];
-        }
-        
-        clientList = new String[splitComma.length];
-        
-        int i = 0;
-        for (String string : splitComma) {
-            clientList[i] = string;
-            i++;
-        }
-        jList1.setModel(new AbstractListModel<String>() {
-            @Override
-            public int getSize() {
-                return clientList.length;
-            }
-            @Override
-            public String getElementAt(int index) {
-                return clientList[index];
-            }
-        });
 
+        try {
+            String msg = client.receive();
+            //System.out.println(msg);
+
+            String splitColon[] = msg.split(":");
+
+            String splitComma[] = splitColon[1].split(",");
+            if (splitComma.length == 0) {
+                splitComma = new String[1];
+                splitComma[0] = splitColon[1];
+            }
+
+            clientList = new String[splitComma.length];
+
+            int i = 0;
+            for (String string : splitComma) {
+                clientList[i] = string;
+                i++;
+            }
+            jList1.setModel(new AbstractListModel<String>() {
+                @Override
+                public int getSize() {
+                    return clientList.length;
+                }
+
+                @Override
+                public String getElementAt(int index) {
+                    return clientList[index];
+                }
+            });
+        } catch (Exception e) {
+
+        }
+
+        isLoggedIn = true;
+        jButton2.setText("Logout");
     }
 
 }
