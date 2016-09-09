@@ -6,27 +6,27 @@
 package ClientUI;
 
 import com.mycompany.ca1.client.EchoClient;
-import com.sun.jmx.remote.internal.ClientListenerInfo;
-import java.awt.Color;
+import com.mycompany.ca1.client.MessageListener;
+import com.mycompany.ca1.client.Observer;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
-import javax.swing.ListModel;
 import shared.ProtocolStrings;
 
 /**
  *
  * @author TimmosQuadros
  */
-public class GUI extends javax.swing.JFrame {
+public class GUI extends javax.swing.JFrame implements Observer{
 
     private final int MAX_USERS = 1000;
     EchoClient client = new EchoClient();
     String[] clientList;
+    String[] receivers;
     boolean isLoggedIn = false;
+    MessageListener msgLis;
 
     /**
      * Creates new form GUI
@@ -85,6 +85,7 @@ public class GUI extends javax.swing.JFrame {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Chat");
 
         jButton2.setText("Login");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -99,7 +100,7 @@ public class GUI extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
+                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -110,7 +111,6 @@ public class GUI extends javax.swing.JFrame {
                 .addContainerGap(66, Short.MAX_VALUE))
         );
 
-        jTextField2.setText("jTextField2");
         jTextField2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField2ActionPerformed(evt);
@@ -130,9 +130,9 @@ public class GUI extends javax.swing.JFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                 .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(51, 51, 51)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -150,11 +150,6 @@ public class GUI extends javax.swing.JFrame {
 
         getContentPane().add(jPanel6, java.awt.BorderLayout.PAGE_END);
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane2.setViewportView(jList1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -177,7 +172,7 @@ public class GUI extends javax.swing.JFrame {
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -194,16 +189,23 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         if (isLoggedIn) {
-
+            client.send("LOGOUT:");
+            msgLis.setIsloggedIn(false);
+            isLoggedIn=false;
+            jButton2.setText("Login");
         } else {
             client.send(ProtocolStrings.ARGS.LOGIN + ":" + jTextField2.getText());
+            setTitle(jTextField2.getText());
             receiveClientList();
+            isLoggedIn = true;
+            startListening();
+            
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         List<String> userList = jList1.getSelectedValuesList();
-        String msg = "";
+        String msg;
         String temp = "";
         if (userList.isEmpty()) {
             client.send("MSG::" + jTextField2.getText());
@@ -288,7 +290,6 @@ public class GUI extends javax.swing.JFrame {
                 }
             }
         }).start();
-
     }
 
     public void receiveClientList() {
@@ -326,9 +327,53 @@ public class GUI extends javax.swing.JFrame {
         } catch (Exception e) {
 
         }
-
-        isLoggedIn = true;
         jButton2.setText("Logout");
+    }
+
+    @Override
+    public void responseReceived(String msg) {
+        parseMessage(msg);
+    }
+    
+    public void parseMessage(String msg){
+        String[] splitColon = msg.split(":");
+        String splitComma[];
+        if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.CLIENTLIST.name())){
+            splitComma=splitColon[1].split(",");
+            if (splitComma.length == 0) {
+                splitComma = new String[1];
+                splitComma[0] = splitColon[1];
+            }
+            clientList = new String[splitComma.length];
+            int i = 0;
+            for (String string : splitComma) {
+                clientList[i] = string;
+                i++;
+            }
+            jList1.setModel(new AbstractListModel<String>() {
+                @Override
+                public int getSize() {
+                    return clientList.length;
+                }
+
+                @Override
+                public String getElementAt(int index) {
+                    return clientList[index];
+                }
+            });
+        }else if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.MSGRESP.name())){
+            jTextArea1.append(splitColon[1]+": "+splitColon[2]+"\n");
+        }else{
+            
+        }
+    }
+
+    private void startListening() {
+        //jTextArea1.append("Startlistening");
+        msgLis = new MessageListener(client);
+        msgLis.setIsloggedIn(true);
+        msgLis.registerObserver(this);
+        msgLis.start();
     }
 
 }

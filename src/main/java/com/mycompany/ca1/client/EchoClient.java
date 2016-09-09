@@ -19,20 +19,9 @@ public class EchoClient{
     private InetAddress serverAddress;
     private Scanner input;
     private PrintWriter output;
-    private List<Observer> observers = new ArrayList<>();
     
     public Socket getSocket(){
         return socket;
-    }
-
-    public void notifyAllObservers(String msg) {
-        for (Observer observer : observers) {
-            observer.begin(msg);
-        }
-    }
-
-    public void registerObserver(Observer o) {
-        observers.add(o);
     }
 
     public void connect(String address, int port) throws UnknownHostException, IOException {
@@ -47,16 +36,12 @@ public class EchoClient{
         output.println(msg);
     }
     
-    
-    
-    
     public void stop() throws IOException {
         output.println(ProtocolStrings.ARGS.STOP);
     }
 
     public String receive() {
-        String msg = input.nextLine();
-        notifyAllObservers(msg);
+        String msg = input.nextLine(); //Blocking call (until it receives respond from server).
         if (msg.equals(ProtocolStrings.STOP)) {
             try {
                 socket.close();

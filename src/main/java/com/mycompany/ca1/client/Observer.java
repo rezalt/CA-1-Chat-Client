@@ -10,5 +10,5 @@ package com.mycompany.ca1.client;
  * @author TimmosQuadros
  */
 public interface Observer {
-    void begin(String msg);
+    void responseReceived(String msg);
 }
