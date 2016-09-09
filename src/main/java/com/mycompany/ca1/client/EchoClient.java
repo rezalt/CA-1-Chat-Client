@@ -14,7 +14,7 @@ import javax.swing.JList;
 import javax.swing.JTextArea;
 import shared.ProtocolStrings;
 
-public class EchoClient{
+public class EchoClient extends Thread{
 
     Socket socket;
     private int port;
@@ -38,7 +38,7 @@ public class EchoClient{
         output.println(msg);
     }
     
-    public void stop() throws IOException {
+    public void stopThread() throws IOException {
         output.println(ProtocolStrings.ARGS.STOP);
     }
 

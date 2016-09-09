@@ -19,21 +19,22 @@ import shared.ProtocolStrings;
  *
  * @author TimmosQuadros
  */
-public class GUI extends javax.swing.JFrame implements Observer{
-
+public class GUI extends javax.swing.JFrame implements Observer {
+    
     private final int MAX_USERS = 1000;
     EchoClient client = new EchoClient();
     String[] clientList;
     String[] receivers;
     boolean isLoggedIn = false;
     MessageListener msgLis;
+    String ip;
+    int port;
 
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
-        init();
     }
 
     /**
@@ -53,6 +54,10 @@ public class GUI extends javax.swing.JFrame implements Observer{
         jButton2 = new javax.swing.JButton();
         jTextField2 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -124,15 +129,44 @@ public class GUI extends javax.swing.JFrame implements Observer{
             }
         });
 
+        jLabel1.setText("IP");
+
+        jTextField3.setText("localhost");
+        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField3ActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setText("Port");
+
+        jTextField4.setText("8080");
+        jTextField4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE))
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(51, 51, 51)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(40, 40, 40)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -145,6 +179,12 @@ public class GUI extends javax.swing.JFrame implements Observer{
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField2)
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(27, 27, 27)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -160,7 +200,7 @@ public class GUI extends javax.swing.JFrame implements Observer{
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
         );
 
         jTextArea1.setColumns(20);
@@ -172,7 +212,7 @@ public class GUI extends javax.swing.JFrame implements Observer{
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -191,9 +231,10 @@ public class GUI extends javax.swing.JFrame implements Observer{
         if (isLoggedIn) {
             client.send("LOGOUT:");
             msgLis.setIsloggedIn(false);
-            isLoggedIn=false;
+            isLoggedIn = false;
             jButton2.setText("Login");
         } else {
+            init(jTextField3.getText(), Integer.parseInt(jTextField4.getText()));
             client.send(ProtocolStrings.ARGS.LOGIN + ":" + jTextField2.getText());
             setTitle(jTextField2.getText());
             receiveClientList();
@@ -209,15 +250,15 @@ public class GUI extends javax.swing.JFrame implements Observer{
         String temp = "";
         if (userList.isEmpty()) {
             client.send("MSG::" + jTextField2.getText());
-            jTextArea1.append("Mig: "+jTextField2.getText()+"\n");
+            jTextArea1.append("Mig: " + jTextField2.getText() + "\n");
         } else {
             for (String string : userList) {
                 temp = temp + string + ",";
             }
-            msg = "MSG:"+temp.substring(0, temp.length()-1)+":"+jTextField2.getText();           
+            msg = "MSG:" + temp.substring(0, temp.length() - 1) + ":" + jTextField2.getText();            
             client.send(msg);
-         //   jTextArea1.setForeground(Color.red);
-            jTextArea1.append("Mig: "+jTextField2.getText()+"\n");
+            //   jTextArea1.setForeground(Color.red);
+            jTextArea1.append("Mig: " + jTextField2.getText() + "\n");
             
         }
 
@@ -226,6 +267,14 @@ public class GUI extends javax.swing.JFrame implements Observer{
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField3ActionPerformed
+
+    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -265,6 +314,8 @@ public class GUI extends javax.swing.JFrame implements Observer{
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -277,22 +328,31 @@ public class GUI extends javax.swing.JFrame implements Observer{
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
     // End of variables declaration//GEN-END:variables
 
-    private void init() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    client.connect("localhost", 8080);
-                } catch (IOException ex) {
-                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-                    System.out.println(ex.getMessage());
-                }
-            }
-        }).start();
+    private void init(String ip, int port) {
+        try {
+            //        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    client.connect(ip, port);
+//                } catch (IOException ex) {
+//                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+//                    //System.out.println(ex.getMessage());
+//                }
+//            }
+//        }).start();
+            client.start();
+            client.connect(ip, port);
+            
+        } catch (IOException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-
+    
     public void receiveClientList() {
         client.receiveClientList(jButton2, jList1);
 //        try {
@@ -330,13 +390,13 @@ public class GUI extends javax.swing.JFrame implements Observer{
 //        }
 //        jButton2.setText("Logout");
     }
-
+    
     @Override
     public void responseReceived(String msg) {
         parseMessage(msg);
     }
     
-    public void parseMessage(String msg){
+    public void parseMessage(String msg) {
         client.parseMessage(msg, jList1, jTextArea1);
 //        String[] splitColon = msg.split(":");
 //        String splitComma[];
@@ -369,7 +429,7 @@ public class GUI extends javax.swing.JFrame implements Observer{
 //            
 //        }
     }
-
+    
     private void startListening() {
         //jTextArea1.append("Startlistening");
         msgLis = new MessageListener(client);
@@ -377,5 +437,5 @@ public class GUI extends javax.swing.JFrame implements Observer{
         msgLis.registerObserver(this);
         msgLis.start();
     }
-
+    
 }
