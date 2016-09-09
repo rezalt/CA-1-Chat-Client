@@ -209,6 +209,7 @@ public class GUI extends javax.swing.JFrame implements Observer{
         String temp = "";
         if (userList.isEmpty()) {
             client.send("MSG::" + jTextField2.getText());
+            jTextArea1.append("Mig: "+jTextField2.getText()+"\n");
         } else {
             for (String string : userList) {
                 temp = temp + string + ",";
@@ -293,41 +294,41 @@ public class GUI extends javax.swing.JFrame implements Observer{
     }
 
     public void receiveClientList() {
-
-        try {
-            String msg = client.receive();
-            //System.out.println(msg);
-
-            String splitColon[] = msg.split(":");
-
-            String splitComma[] = splitColon[1].split(",");
-            if (splitComma.length == 0) {
-                splitComma = new String[1];
-                splitComma[0] = splitColon[1];
-            }
-
-            clientList = new String[splitComma.length];
-
-            int i = 0;
-            for (String string : splitComma) {
-                clientList[i] = string;
-                i++;
-            }
-            jList1.setModel(new AbstractListModel<String>() {
-                @Override
-                public int getSize() {
-                    return clientList.length;
-                }
-
-                @Override
-                public String getElementAt(int index) {
-                    return clientList[index];
-                }
-            });
-        } catch (Exception e) {
-
-        }
-        jButton2.setText("Logout");
+        client.receiveClientList(jButton2, jList1);
+//        try {
+//            String msg = client.receive();
+//            //System.out.println(msg);
+//
+//            String splitColon[] = msg.split(":");
+//
+//            String splitComma[] = splitColon[1].split(",");
+//            if (splitComma.length == 0) {
+//                splitComma = new String[1];
+//                splitComma[0] = splitColon[1];
+//            }
+//
+//            clientList = new String[splitComma.length];
+//
+//            int i = 0;
+//            for (String string : splitComma) {
+//                clientList[i] = string;
+//                i++;
+//            }
+//            jList1.setModel(new AbstractListModel<String>() {
+//                @Override
+//                public int getSize() {
+//                    return clientList.length;
+//                }
+//
+//                @Override
+//                public String getElementAt(int index) {
+//                    return clientList[index];
+//                }
+//            });
+//        } catch (Exception e) {
+//
+//        }
+//        jButton2.setText("Logout");
     }
 
     @Override
@@ -336,36 +337,37 @@ public class GUI extends javax.swing.JFrame implements Observer{
     }
     
     public void parseMessage(String msg){
-        String[] splitColon = msg.split(":");
-        String splitComma[];
-        if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.CLIENTLIST.name())){
-            splitComma=splitColon[1].split(",");
-            if (splitComma.length == 0) {
-                splitComma = new String[1];
-                splitComma[0] = splitColon[1];
-            }
-            clientList = new String[splitComma.length];
-            int i = 0;
-            for (String string : splitComma) {
-                clientList[i] = string;
-                i++;
-            }
-            jList1.setModel(new AbstractListModel<String>() {
-                @Override
-                public int getSize() {
-                    return clientList.length;
-                }
-
-                @Override
-                public String getElementAt(int index) {
-                    return clientList[index];
-                }
-            });
-        }else if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.MSGRESP.name())){
-            jTextArea1.append(splitColon[1]+": "+splitColon[2]+"\n");
-        }else{
-            
-        }
+        client.parseMessage(msg, jList1, jTextArea1);
+//        String[] splitColon = msg.split(":");
+//        String splitComma[];
+//        if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.CLIENTLIST.name())){
+//            splitComma=splitColon[1].split(",");
+//            if (splitComma.length == 0) {
+//                splitComma = new String[1];
+//                splitComma[0] = splitColon[1];
+//            }
+//            clientList = new String[splitComma.length];
+//            int i = 0;
+//            for (String string : splitComma) {
+//                clientList[i] = string;
+//                i++;
+//            }
+//            jList1.setModel(new AbstractListModel<String>() {
+//                @Override
+//                public int getSize() {
+//                    return clientList.length;
+//                }
+//
+//                @Override
+//                public String getElementAt(int index) {
+//                    return clientList[index];
+//                }
+//            });
+//        }else if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.MSGRESP.name())){
+//            jTextArea1.append(splitColon[1]+": "+splitColon[2]+"\n");
+//        }else{
+//            
+//        }
     }
 
     private void startListening() {

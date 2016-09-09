@@ -5,11 +5,13 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractListModel;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JTextArea;
 import shared.ProtocolStrings;
 
 public class EchoClient{
@@ -50,6 +52,77 @@ public class EchoClient{
             }
         }
         return msg;
+    }
+    
+    public void receiveClientList(JButton login, JList<String> list) {
+
+        try {
+            String msg = this.receive();
+            //System.out.println(msg);
+
+            String splitColon[] = msg.split(":");
+
+            String splitComma[] = splitColon[1].split(",");
+            if (splitComma.length == 0) {
+                splitComma = new String[1];
+                splitComma[0] = splitColon[1];
+            }
+
+            String[] clientList = new String[splitComma.length];
+
+            int i = 0;
+            for (String string : splitComma) {
+                clientList[i] = string;
+                i++;
+            }
+            list.setModel(new AbstractListModel<String>() {
+                @Override
+                public int getSize() {
+                    return clientList.length;
+                }
+
+                @Override
+                public String getElementAt(int index) {
+                    return clientList[index];
+                }
+            });
+        } catch (Exception e) {
+
+        }
+        login.setText("Logout");
+    }
+    
+    public void parseMessage(String msg, JList<String> jList1, JTextArea jTextArea1){
+        String[] splitColon = msg.split(":");
+        String splitComma[];
+        if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.CLIENTLIST.name())){
+            splitComma=splitColon[1].split(",");
+            if (splitComma.length == 0) {
+                splitComma = new String[1];
+                splitComma[0] = splitColon[1];
+            }
+            String[] clientList = new String[splitComma.length];
+            int i = 0;
+            for (String string : splitComma) {
+                clientList[i] = string;
+                i++;
+            }
+            jList1.setModel(new AbstractListModel<String>() {
+                @Override
+                public int getSize() {
+                    return clientList.length;
+                }
+
+                @Override
+                public String getElementAt(int index) {
+                    return clientList[index];
+                }
+            });
+        }else if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.MSGRESP.name())){
+            jTextArea1.append(splitColon[1]+": "+splitColon[2]+"\n");
+        }else{
+            
+        }
     }
 
     public boolean isStopped() {
