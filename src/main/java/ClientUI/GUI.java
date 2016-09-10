@@ -8,19 +8,20 @@ package ClientUI;
 import com.mycompany.ca1.client.EchoClient;
 import com.mycompany.ca1.client.MessageListener;
 import com.mycompany.ca1.client.Observer;
+import com.sun.glass.events.KeyEvent;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractListModel;
 import shared.ProtocolStrings;
 
 /**
  *
  * @author TimmosQuadros
  */
-public class GUI extends javax.swing.JFrame implements Observer {
-    
+public class GUI extends javax.swing.JFrame implements Observer
+{
+
     private final int MAX_USERS = 1000;
     EchoClient client = new EchoClient();
     String[] clientList;
@@ -33,8 +34,10 @@ public class GUI extends javax.swing.JFrame implements Observer {
     /**
      * Creates new form GUI
      */
-    public GUI() {
+    public GUI()
+    {
         initComponents();
+       
     }
 
     /**
@@ -44,7 +47,8 @@ public class GUI extends javax.swing.JFrame implements Observer {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -93,8 +97,10 @@ public class GUI extends javax.swing.JFrame implements Observer {
         setTitle("Chat");
 
         jButton2.setText("Login");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButton2.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jButton2ActionPerformed(evt);
             }
         });
@@ -116,15 +122,26 @@ public class GUI extends javax.swing.JFrame implements Observer {
                 .addContainerGap(66, Short.MAX_VALUE))
         );
 
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jTextField2.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jTextField2ActionPerformed(evt);
+            }
+        });
+        jTextField2.addKeyListener(new java.awt.event.KeyAdapter()
+        {
+            public void keyPressed(java.awt.event.KeyEvent evt)
+            {
+                jTextField2KeyPressed(evt);
             }
         });
 
         jButton1.setText("Send");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jButton1.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jButton1ActionPerformed(evt);
             }
         });
@@ -132,8 +149,10 @@ public class GUI extends javax.swing.JFrame implements Observer {
         jLabel1.setText("IP");
 
         jTextField3.setText("localhost");
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jTextField3.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jTextField3ActionPerformed(evt);
             }
         });
@@ -141,8 +160,10 @@ public class GUI extends javax.swing.JFrame implements Observer {
         jLabel2.setText("Port");
 
         jTextField4.setText("8080");
-        jTextField4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jTextField4.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 jTextField4ActionPerformed(evt);
             }
         });
@@ -152,14 +173,14 @@ public class GUI extends javax.swing.JFrame implements Observer {
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE))
+                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel6Layout.createSequentialGroup()
@@ -203,8 +224,10 @@ public class GUI extends javax.swing.JFrame implements Observer {
             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
         );
 
+        jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
+        jTextArea1.setFocusable(false);
         jScrollPane1.setViewportView(jTextArea1);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -228,44 +251,66 @@ public class GUI extends javax.swing.JFrame implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if (isLoggedIn) {
-            client.send("LOGOUT:");
-            msgLis.setIsloggedIn(false);
-            isLoggedIn = false;
-            jButton2.setText("Login");
-        } else {
-            init(jTextField3.getText(), Integer.parseInt(jTextField4.getText()));
-            client.send(ProtocolStrings.ARGS.LOGIN + ":" + jTextField2.getText());
-            setTitle(jTextField2.getText());
-            receiveClientList();
-            isLoggedIn = true;
-            startListening();
-            
+
+        if (!jTextField2.getText().isEmpty())
+        {
+            if (isLoggedIn)
+            {
+                client.send("LOGOUT:");
+                msgLis.setIsloggedIn(false);
+                isLoggedIn = false;
+                jButton2.setText("Login");
+            }
+            else
+            {
+                init(jTextField3.getText(), Integer.parseInt(jTextField4.getText()));
+                client.send(ProtocolStrings.ARGS.LOGIN + ":" + jTextField2.getText());
+                setTitle(jTextField2.getText());
+                receiveClientList();
+                isLoggedIn = true;
+                startListening();
+                jTextArea1.removeAll();
+            }
+        }
+        else
+        {
+            jTextArea1.append("Please enter a username before logging in. \n");
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        List<String> userList = jList1.getSelectedValuesList();
-        String msg;
-        String temp = "";
-        if (userList.isEmpty()) {
-            client.send("MSG::" + jTextField2.getText());
-            jTextArea1.append("Mig: " + jTextField2.getText() + "\n");
-        } else {
-            for (String string : userList) {
-                temp = temp + string + ",";
+        if (isLoggedIn)
+        {
+            List<String> userList = jList1.getSelectedValuesList();
+            String msg;
+            String temp = "";
+            if (userList.isEmpty())
+            {
+                client.send("MSG::" + jTextField2.getText());
+                jTextArea1.append("Mig: " + jTextField2.getText() + "\n");
             }
-            msg = "MSG:" + temp.substring(0, temp.length() - 1) + ":" + jTextField2.getText();            
-            client.send(msg);
-            //   jTextArea1.setForeground(Color.red);
-            jTextArea1.append("Mig: " + jTextField2.getText() + "\n");
-            
+            else
+            {
+                for (String string : userList)
+                {
+                    temp = temp + string + ",";
+                }
+                msg = "MSG:" + temp.substring(0, temp.length() - 1) + ":" + jTextField2.getText();
+                client.send(msg);
+                //   jTextArea1.setForeground(Color.red);
+                jTextArea1.append("Mig: " + jTextField2.getText() + "\n");
+
+            }
+        }
+        else
+        {
+            jTextArea1.append("Please enter a username and log in. \n");
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_jTextField2ActionPerformed
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
@@ -276,36 +321,90 @@ public class GUI extends javax.swing.JFrame implements Observer {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField4ActionPerformed
 
+    private void jTextField2KeyPressed(java.awt.event.KeyEvent evt)//GEN-FIRST:event_jTextField2KeyPressed
+    {//GEN-HEADEREND:event_jTextField2KeyPressed
+
+        if (isLoggedIn)
+        {
+            if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            {
+                List<String> userList = jList1.getSelectedValuesList();
+                String msg;
+                String temp = "";
+                if (userList.isEmpty())
+                {
+                    client.send("MSG::" + jTextField2.getText());
+                    jTextArea1.append("Mig: " + jTextField2.getText() + "\n");
+                }
+                else
+                {
+                    for (String string : userList)
+                    {
+                        temp = temp + string + ",";
+                    }
+                    msg = "MSG:" + temp.substring(0, temp.length() - 1) + ":" + jTextField2.getText();
+                    client.send(msg);
+                    //   jTextArea1.setForeground(Color.red);
+                    jTextArea1.append("Mig: " + jTextField2.getText() + "\n");
+
+                }
+                jTextField2.setText("");
+            }
+        }
+        else if (!isLoggedIn)
+        {
+            if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            {
+
+                jTextArea1.append("Please enter a username and log in. \n");
+            }
+        }
+    }//GEN-LAST:event_jTextField2KeyPressed
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[])
+    {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+        try
+        {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+            {
+                if ("Nimbus".equals(info.getName()))
+                {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
+        }
+        catch (ClassNotFoundException ex)
+        {
             java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
+        }
+        catch (InstantiationException ex)
+        {
             java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
+        }
+        catch (IllegalAccessException ex)
+        {
             java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException ex)
+        {
             java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+        java.awt.EventQueue.invokeLater(new Runnable()
+        {
+            public void run()
+            {
                 new GUI().setVisible(true);
             }
         });
@@ -332,110 +431,45 @@ public class GUI extends javax.swing.JFrame implements Observer {
     private javax.swing.JTextField jTextField4;
     // End of variables declaration//GEN-END:variables
 
-    private void init(String ip, int port) {
-        try {
-            //        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    client.connect(ip, port);
-//                } catch (IOException ex) {
-//                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-//                    //System.out.println(ex.getMessage());
-//                }
-//            }
-//        }).start();
+    private void init(String ip, int port)
+    {
+        try
+        {
             client.start();
             client.connect(ip, port);
-            
-        } catch (IOException ex) {
+
+        }
+        catch (IOException ex)
+        {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+             jTextArea1.append("ERROR: Cannot connect to chat server. \n");
         }
     }
-    
-    public void receiveClientList() {
+
+    public void receiveClientList()
+    {
         client.receiveClientList(jButton2, jList1);
-//        try {
-//            String msg = client.receive();
-//            //System.out.println(msg);
-//
-//            String splitColon[] = msg.split(":");
-//
-//            String splitComma[] = splitColon[1].split(",");
-//            if (splitComma.length == 0) {
-//                splitComma = new String[1];
-//                splitComma[0] = splitColon[1];
-//            }
-//
-//            clientList = new String[splitComma.length];
-//
-//            int i = 0;
-//            for (String string : splitComma) {
-//                clientList[i] = string;
-//                i++;
-//            }
-//            jList1.setModel(new AbstractListModel<String>() {
-//                @Override
-//                public int getSize() {
-//                    return clientList.length;
-//                }
-//
-//                @Override
-//                public String getElementAt(int index) {
-//                    return clientList[index];
-//                }
-//            });
-//        } catch (Exception e) {
-//
-//        }
-//        jButton2.setText("Logout");
+
     }
-    
+
     @Override
-    public void responseReceived(String msg) {
+    public void responseReceived(String msg)
+    {
         parseMessage(msg);
     }
-    
-    public void parseMessage(String msg) {
+
+    public void parseMessage(String msg)
+    {
         client.parseMessage(msg, jList1, jTextArea1);
-//        String[] splitColon = msg.split(":");
-//        String splitComma[];
-//        if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.CLIENTLIST.name())){
-//            splitComma=splitColon[1].split(",");
-//            if (splitComma.length == 0) {
-//                splitComma = new String[1];
-//                splitComma[0] = splitColon[1];
-//            }
-//            clientList = new String[splitComma.length];
-//            int i = 0;
-//            for (String string : splitComma) {
-//                clientList[i] = string;
-//                i++;
-//            }
-//            jList1.setModel(new AbstractListModel<String>() {
-//                @Override
-//                public int getSize() {
-//                    return clientList.length;
-//                }
-//
-//                @Override
-//                public String getElementAt(int index) {
-//                    return clientList[index];
-//                }
-//            });
-//        }else if(splitColon[0].equalsIgnoreCase(ProtocolStrings.ARGS.MSGRESP.name())){
-//            jTextArea1.append(splitColon[1]+": "+splitColon[2]+"\n");
-//        }else{
-//            
-//        }
     }
-    
-    private void startListening() {
+
+    private void startListening()
+    {
         //jTextArea1.append("Startlistening");
         msgLis = new MessageListener(client);
         msgLis.setIsloggedIn(true);
         msgLis.registerObserver(this);
         msgLis.start();
     }
-    
+
 }
